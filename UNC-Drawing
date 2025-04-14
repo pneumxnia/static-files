@@ -1,0 +1,7 @@
+local DrawingLib = loadstring(httpGet("https://github.com/pneumxnia/static-files/raw/main/Library.txt"))()
+local DrawingL, drawingFunctions = DrawingLib.Drawing, DrawingLib.functions
+getgenv().Drawing = DrawingL
+for name, func in drawingFunctions do
+	getgenv()[name] = func
+end
+loadstring(httpGet("https://github.com/unified-naming-convention/NamingStandard/raw/main/UNCCheckEnv.lua"))()

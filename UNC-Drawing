@@ -1,4 +1,4 @@
-local DrawingLib = loadstring(httpGet("https://github.com/pneumxnia/static-files/raw/main/Library.txt"))()
+local DrawingLib = loadstring(httpGet("https://github.com/pneumxnia/static-files/raw/mainbranch/Library.txt"))()
 local DrawingL, drawingFunctions = DrawingLib.Drawing, DrawingLib.functions
 getgenv().Drawing = DrawingL
 for name, func in drawingFunctions do

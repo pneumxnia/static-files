@@ -329,3 +329,46 @@ getgenv().checkfunction = getgenv().checknil
 getgenv().isnil = getgenv().checknil
 getgenv().isnilfunc = getgenv().checknil
 getgenv().isnilfunction = getgenv().checknil
+local blocked_methods = {
+    'openvideosfolder', 'openscreenshotsfolder', 'getrobuxbalance', 'performpurchase',
+    'promptbundlepurchase', 'promptnativepurchase', 'promptproductpurchase', 'promptpurchase',
+    'promptthirdpartypurchase', 'publish', 'getmessageid', 'openbrowserwindow', 'requestinternal',
+    'executejavascript', 'togglerecording', 'takescreenshot', 'httprequestasync', 'getlast',
+    'sendcommand', 'getasync', 'getasyncfullurl', 'requestasync', 'makerequest', 'openurl'
+}
+
+local mt_game = getrawmetatable(game)
+local original_index = mt_game["index"]
+local original_namecall = mt_game["namecall"]
+local game_ref = game
+
+setreadonly(mt_game, false)
+
+mt_game["index"] = function(self, key)
+    if self == game_ref and (key == 'HttpGet' or key == 'HttpGetAsync') then
+        return function(self, ...)
+            return game_ref:HttpGet(...)
+        end
+    elseif self == game_ref and key == 'GetObjects' then
+        return function(self, ...)
+            return game_ref:GetObjects(...)
+        end
+    elseif table.find(blocked_methods, string.lower(key)) then
+        return false, "Disabled for security reasons."
+    end
+    return original_index(self, key)
+end
+
+mt_game["namecall"] = function(self, ...)
+    local method_name = string.lower(getnamecallmethod())
+    if self == game_ref and (method_name == 'httpget' or method_name == 'httpgetasync') then
+        return HttpGet(...)
+    elseif self == game_ref and method_name == 'getobjects' then
+        return GetObjects(...)
+    elseif table.find(blocked_methods, method_name) then
+        return false, "Disabled for security reasons."
+    end
+    return original_namecall(self, ...)
+end
+
+setreadonly(mt_game, true)
